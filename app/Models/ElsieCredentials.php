@@ -29,7 +29,7 @@ class ElsieCredentials extends Model
         return optional($this->cookie ?? null, function (string $cookie) {
             return implode('=', [
                 'mojolicious',
-                'eyJkZWxpdmVyeV9hZGRyZXNzIjoiICIsImRlbGl2ZXJ5X2lzbmVlZGVkIjowLCJkZWxpdmVyeV9waG9uZSI6IigwNjEpIDc4Ny02NS03NiwgKDA1MCkgMzQyLTg0LTg5IiwiY29tbWVudCI6IiIsIm5hbWUiOiJhdnRvc3Rla2xvenBAaS51YSIsImV4cGlyZXMiOjE2NDMxMzI4NTl9--440bbb6271fa2a0dbc8aaa33b560e8ac',
+                $cookie,
             ]);
         });
     }

@@ -13,7 +13,7 @@ class DefaultUserSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
 //        User::factory()->afterCreating(function (User  $user) {
 //            $user->elsie_credentials()->create([

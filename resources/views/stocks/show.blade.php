@@ -24,18 +24,11 @@
     </nav>
 
     <h1>@yield('title')</h1>
+    <p>
+        {{ __('ID in parent system - ').$stock->shop_id }}
+    </p>
 
-    <div class="list-group mb-3">
-        @forelse($stockProducts as $stockProduct)
-            <livewire:stock-products.item :stockProduct="$stockProduct"
-                                    wire:key="{{ implode('_', ['product', $loop->index, $stockProduct->product->id]) }}"
-            />
-        @empty
-            <div class="list-group-item">
-                {{ __('No results found.') }}
-            </div>
-        @endforelse
-    </div>
-
-    <x-ui::pagination :links="$stockProducts"/>
+    <a href="{{ route('stock-products', ['stock' => $stock]) }}" class="btn btn-primary">
+        {{ __('To products') }}
+    </a>
 </div>

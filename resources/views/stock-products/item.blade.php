@@ -1,37 +1,59 @@
-<div>
-    <div class="d-inline-flex p-3 w-100 justify-content-between align-items-center">
-        <div class="flex-grow-1">
-            <a href="{{ route('stock-products.show', ['stockProduct' => $stockProduct]) }}"
-               class="text-decoration-none">
-                <div class="flex-grow-1 d-inline-flex">
-                    <div class="flex-shrink-1">
-                        <i class="fa fa-home {{ $stockProduct->prices_count ? 'text-success' : 'text-secondary' }}"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="text-dark">
-                            {{ $stock->name }}
-                        </div>
-                    </div>
-                </div>
+<div class="list-group-item list-group-item-action">
+    <div class="d-inline-flex align-items-center justify-content-between w-100">
+        <div class="flex-grow-0 mb-2 mb-lg-0">
+            <a href="{{ route('stock-products.show', ['stockProduct' => $stockProduct]) }}" class="text-decoration-none text-dark">
+                <ul class="list-unstyled mb-0">
+                    <li >
+                        <strong>{{ $stockProduct->product->elsie_code }}</strong> - {{ $stockProduct->product->name }}
+                    </li>
+                    <li>
+                        <small class="text-secondary">
+                            {{ $stockProduct->product->manufacturer ? $stockProduct->product->manufacturer->name : 'null' }}
+                        </small>
+                    </li>
+                    @if($vehicle = $stockProduct->product->vehicle)
+                        <li>
+                            <a href="{{ route('vehicles.show', ['vehicle' => $vehicle]) }}" class="text-decoration-none" title="{{ __('To vehicle page') }}">
+                                <small class="text-secondary">
+                                    {{ $vehicle->name }} ({{ $vehicle->year_start }}-{{ $vehicle->year_end }}) {{ implode(', ', $vehicle->bodytypes) }}
+                                </small>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
             </a>
         </div>
-        <div class="d-inline-flex flex-nowrap">
-            <a type="button"
-               class="btn btn-link text-decoration-none"
-               title="{{ __('Click to refresh') }}"
-               data-bs-toggle="tooltip"
-               wire:loading.class="disabled"
-               wire:click="getStockProductInfo">
-                <div class="fw-bold text-primary {{ $quantity < 0 ? 'visually-hidden' : '' }}"  wire:loading.class="visually-hidden">
-                    {{ $quantity }} <span class="fw-light">{{ __('pcs') }}</span>
+        <div class="d-inline-flex flex-shrink-1 text-center">
+            @if($quantity = $stockProduct->actual_quantity)
+                <div class="d-block px-2">
+                    <div>
+                        <strong class="text-primary">
+                            {{ $quantity->quantity}}
+                        </strong>
+                        <span>{{ __($quantity->units) }}</span>
+                    </div>
+                    <div>
+                        <small class="text-secondary">
+                            {{ now()->sub($quantity->created_at)->diffForHumans() }}
+                        </small>
+                    </div>
                 </div>
-
-                <div class="spinner-border spinner-border-sm text-secondary visually-hidden" role="status"
-                     wire:loading.class.remove="visually-hidden"
-                     wire:loading.target="getStockProductInfo">
+            @endif
+            @if($price = $stockProduct->actual_price)
+                <div class="d-block">
+                    <div>
+                        <strong class="text-success">
+                            {{ $price->price }}
+                        </strong>
+                        <span>{{ __($price->currency) }}</span>
+                    </div>
+                    <div>
+                        <small class="text-secondary">
+                            {{ now()->sub($price->created_at)->diffForHumans() }}
+                        </small>
+                    </div>
                 </div>
-                <small class="text-secondary fw-light" wire:loading.class="visually-hidden">{{ __('refresh') }}</small>
-            </a>
+            @endif
         </div>
     </div>
 </div>

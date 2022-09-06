@@ -18,10 +18,6 @@ class User extends Authenticatable implements HasMedia
     protected $hidden = ['password', 'remember_token'];
     protected $casts = ['email_verified_at' => 'datetime'];
 
-    protected $with = [
-        'elsie_credentials',
-    ];
-
     protected $table = 'users';
 
     protected $fillable = [

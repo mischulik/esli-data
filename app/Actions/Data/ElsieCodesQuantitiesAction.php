@@ -14,11 +14,12 @@ class ElsieCodesQuantitiesAction
     use AsJob;
 
     //Using for an array of trash_codes
-    public function handle(array $codes)
+    public function handle(array $codes): Collection
     {
         ElsieTrashAction::run($codes, true);
         $trash = ElsieShowTrashAction::run($codes);
-        ElsieTrashAction::run($codes);
+        ElsieRemoveFromTrashAction::run($codes);
+//        ElsieTrashAction::run($codes);
 
         return $this->parseTrash($trash, $codes);
     }
@@ -73,8 +74,11 @@ class ElsieCodesQuantitiesAction
         return $trashItem;
     }
 
-    protected function parseTrash(array $trash, array $codes): Collection
+    protected function parseTrash(array $trash = null, array $codes = null): Collection
     {
+        $trash = $trash ?? [];
+        $codes = $codes ?? [];
+
         return collect($trash)->map(function (array $item) use ($codes) {
             $item = $this->parseTrashItem($item);
             $trachCode = optional($item['trash_code'] ?? null, function (string $code) use ($codes) {

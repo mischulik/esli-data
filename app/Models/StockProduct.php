@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -24,10 +27,16 @@ class StockProduct extends Pivot
         'product_id',
     ];
 
-    protected $withCount = [
-        'quantities',
-        'prices',
-    ];
+    public function scopePresent(Builder $builder)
+    {
+        $builder->where(function (Builder $builder) {
+            $builder->whereHas('prices', function (Builder $builder) {
+                return $builder->where('price', '>', 0);
+            })->whereHas('quantities', function (Builder $builder) {
+                return $builder->where('quantity', '>', 0);
+            });
+        });
+    }
 
     public static function findByTrashCode(string $trashCode): ?StockProduct
     {
@@ -86,23 +95,22 @@ class StockProduct extends Pivot
         return $this->hasMany(StockProductPrice::class, 'stock_product_id', 'id');
     }
 
-    public function getActualPriceAttribute(): ?StockProductPrice
+    public function getActualPriceAttribute(): HasMany
     {
-        return optional($this->prices()->latest()->first() ?? null, function (StockProductPrice $price) {
-            return $price;
-        });
+        return $this->prices()->latest()->first();
     }
 
-    public function quantities()
+    public function quantities(): HasMany
     {
-        return $this->hasMany(StockProductQuantity::class, 'stock_product_id', 'id')->orderBy('created_at');
+        return $this->hasMany(StockProductQuantity::class, 'stock_product_id', 'id');
     }
 
-    public function getActualQuantityAttribute()
+    public function getActualQuantityAttribute(): Model|HasMany|null
     {
         return $this->quantities()->latest()->first();
     }
-    public function resolveRouteBinding($value, $field = null)
+
+    public function resolveRouteBinding($value, $field = null): Model|Collection|Builder|array|null
     {
         return self::query()->find($value);
     }

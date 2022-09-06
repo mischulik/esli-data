@@ -18,12 +18,17 @@
     </nav>
     <h1>@yield('title')</h1>
 
-    <div class="row justify-content-between">
-        <div class="col-lg-auto mb-3 flex-grow-1">
-            <div class="input-group">
-                <span class="input-group-text"><x-ui::icon name="search"/></span>
-                <input type="search" placeholder="{{ __('Search Stocks') }}"
-                       class="form-control shadow-none" wire:model.debounce.500ms="search">
+    <div class="mb-3">
+        <div class="input-group mb-3">
+            <span class="input-group-text"><x-ui::icon name="search"/></span>
+            <input type="search" placeholder="{{ __('Search Stocks') }}" class="form-control shadow-none" wire:model.debounce.500ms="search">
+        </div>
+        <div class="input-group mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="show_all" wire:model="showFilled">
+                <label class="form-check-label" for="flexSwitchCheckDefault">
+                    {{ __('Show only stocks with products') }}
+                </label>
             </div>
         </div>
     </div>

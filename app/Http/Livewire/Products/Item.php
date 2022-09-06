@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Products;
 
+use App\Jobs\GetStockProductInfoJob;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\StockProduct;
@@ -36,7 +37,10 @@ class Item extends Component
 
     public function quantityForStock(Stock $stock)
     {
-        return optional($this->product->stock_products()->firstWhere('stock_id', '=', $stock->id) ?? null, function (StockProduct  $stockProduct) {
+        $sp = $this->product->stock_products()->firstWhere('stock_id', '=', $stock->id) ?? null;
+        GetStockProductInfoJob::dispatchSync($sp);
+
+        return optional($sp, function (StockProduct  $stockProduct) {
             return $stockProduct->actual_quantity;
         });
     }

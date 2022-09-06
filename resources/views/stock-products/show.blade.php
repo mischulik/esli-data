@@ -1,11 +1,10 @@
 @section('title', $stockProduct->product->elsie_code.' - '.$stockProduct->stock->name)
 
 @push('styles')
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endpush
 
 @push('scripts')
-    @livewireChartsScripts
+    <script src="//unpkg.com/alpinejs"></script>
 @endpush
 
 <div>
@@ -43,13 +42,14 @@
         <div class="flex-grow-1">
             <h1>@yield('title')</h1>
             <h5>{{ $stockProduct->product->name }}</h5>
-            <h6>{{ $stockProduct->product->vehicle ? $stockProduct->product->vehicle->full_name : '' }}</h6>
+            @if($vehicle = $stockProduct->product->vehicle)
+            <h6>{{ $vehicle->full_name }}</h6>
+            @endif
         </div>
         <div class="flex-fill justify-content-end">
             @if($actualPrice = $stockProduct->actual_price)
                 <div class="d-block mb-1">
-                    <div class="d-flex justify-content-around"
-                         title="{{now()->sub($actualPrice->created_at)->longRelativeToNowDiffForHumans() }}">
+                    <div class="d-flex justify-content-between" title="{{now()->sub($actualPrice->created_at)->longRelativeToNowDiffForHumans() }}">
                         <small class="text-secondary">
                             {{ __('Last known price') }}
                         </small>
@@ -61,7 +61,7 @@
             @endif
             @if($actualQuantity = $stockProduct->actual_quantity)
                 <div class="d-block mb-1">
-                    <div class="d-flex justify-content-around"
+                    <div class="d-flex justify-content-between"
                          title="{{ now()->sub($actualQuantity->created_at)->shortRelativeToNowDiffForHumans() }}">
                         <small class="text-secondary">
                             {{ __('Last known quantity') }}
@@ -73,8 +73,8 @@
                 </div>
             @endif
             <div class="d-block mb-2">
-                <div class="d-flex justify-content-around align-items-center">
-                    <small>{{ __('For fresh data click ->') }}</small>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">{{ __('For fresh data click') }}</small>
                     <a type="button" class="btn btn-link text-decoration-none" wire:loading.class="disabled"
                        wire:click="getStockProductInfo">
                         <div class="spinner-border visually-hidden" role="status"
@@ -87,23 +87,19 @@
             </div>
         </div>
     </div>
-    @if(!is_null($quantityChartModel))
-        <div class="shadow-sm mb-5" style="height: 10rem;">
-            <h4 class="m-0 p-0 text-center">{{ __('Quantities') }}</h4>
-            <livewire:livewire-area-chart
-                    key="{{ $quantityChartModel->reactiveKey() }}"
-                    :area-chart-model="$quantityChartModel"
-            />
-        </div>
-    @endif
 
-    @if(!is_null($pricesChartModel))
-        <div class="shadow-sm mb-5" style="height: 10rem;">
-            <h4 class="m-0 p-0 text-center">{{ __('Price Dynamic') }}</h4>
-            <livewire:livewire-area-chart
-                    key="{{ $pricesChartModel->reactiveKey() }}"
-                    :area-chart-model="$pricesChartModel"
-            />
+    @forelse($stockProduct->quantities as $quantity)
+        <div>
+            {{ $quantity->quantity }}
         </div>
-    @endif
+    @empty
+    @endforelse
+
+    @forelse($stockProduct->prices as $price)
+        <div>
+            {{ $price->price }}
+        </div>
+    @empty
+    @endforelse
+
 </div>

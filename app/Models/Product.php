@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Kirschbaum\PowerJoins\PowerJoins;
-use MVanDuijker\TransactionalModelEvents\TransactionalAwareEvents;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+//use Kirschbaum\PowerJoins\PowerJoins;
+//use MVanDuijker\TransactionalModelEvents\TransactionalAwareEvents;
+//use Spatie\MediaLibrary\HasMedia;
+//use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
@@ -20,9 +23,6 @@ class Product extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
-    use PowerJoins;
-    use TransactionalAwareEvents;
-    use HasRelationships;
 
     protected $table = 'products';
 
@@ -38,20 +38,20 @@ class Product extends Model implements HasMedia
         'note',
     ];
 
-    public static function booted()
-    {
-        static::created(function (Product $product) {
-            $product->stock_products()->createMany(Stock::all()->pluck('id')->map(function (int $id) {
-                return [
-                    'stock_id' => $id,
-                ];
-            })->toArray());
-
-            $product->stock_products()->get()->each(function (StockProduct $stockProduct) {
-                StockProductInfoAction::run($stockProduct);
-            });
-        });
-    }
+//    public static function booted()
+//    {
+//        static::created(function (Product $product) {
+//            $product->stock_products()->createMany(Stock::all()->pluck('id')->map(function (int $id) {
+//                return [
+//                    'stock_id' => $id,
+//                ];
+//            })->toArray());
+//
+//            $product->stock_products()->get()->each(function (StockProduct $stockProduct) {
+//                StockProductInfoAction::run($stockProduct);
+//            });
+//        });
+//    }
 
 
     public function scopeGlasses(Builder $builder): Builder
@@ -111,9 +111,16 @@ class Product extends Model implements HasMedia
         return $this->hasMany(StockProduct::class, 'product_id', 'id');
     }
 
-    public function latestPrice()
+    public function latestPrice(): HasOneThrough
     {
-        return $this->hasOneThrough(StockProductPrice::class, StockProduct::class, 'product_id', 'stock_product_id', 'id', 'id')->latest('stock_product_prices.created_at');
+        return $this->hasOneThrough(
+            StockProductPrice::class,
+            StockProduct::class,
+            'product_id',
+            'stock_product_id',
+            'id',
+            'id')
+            ->latest('stock_product_prices.created_at');
     }
 
     public function quantities(): HasManyThrough

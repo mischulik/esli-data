@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -21,10 +22,6 @@ class Stock extends Model implements HasMedia
         'shop_id',
     ];
 
-    protected $withCount = [
-        'products',
-    ];
-
     public function stock_products(): HasMany
     {
         return $this->hasMany(StockProduct::class, 'stock_id', 'id');
@@ -33,5 +30,12 @@ class Stock extends Model implements HasMedia
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, StockProduct::class, 'stock_id', 'product_id', 'id', 'id');
+    }
+
+    public function scopeFilled(Builder $builder)
+    {
+        $builder->whereHas('stock_products', function (Builder $builder) {
+            $builder->present();
+        });
     }
 }

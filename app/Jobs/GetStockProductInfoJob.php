@@ -53,7 +53,6 @@ class GetStockProductInfoJob implements ShouldQueue
      */
     public function handle(StockProduct $stockProduct)
     {
-        $this->stockProduct = $stockProduct->exists ? $stockProduct : $this->stockProduct;
-        StockProductInfoAction::run($this->getStockProduct());
+        StockProductInfoAction::run($stockProduct);
     }
 }

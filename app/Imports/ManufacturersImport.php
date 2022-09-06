@@ -30,7 +30,7 @@ class ManufacturersImport implements ToModel, WithHeadingRow, WithUpserts, WithV
      *
      * @return Manufacturer|Model|null
      */
-    public function model(array $row)
+    public function model(array $row): Manufacturer|Model|null
     {
         return new Manufacturer([
             'code_suffix' => trim($row['rassirenie_koda_elsi'], '-'),

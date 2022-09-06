@@ -18,15 +18,18 @@ class Item extends Component
     public function render()
     {
         return view('stocks.item')->with([
-            'itemsCount' => $this->query()->whereHas('prices', function (Builder $builder) {
-                return $builder->where('price', '>', 0);
-            })->whereHas('quantities', function (Builder $builder) {
-                return $builder->where('quantity', '>', 0);
-            })->count(),
+            'itemsCount' => $this->query()
+                ->where(function (Builder $builder) {
+                    $builder->whereHas('prices', function (Builder $builder) {
+                        return $builder->where('price', '>', 0);
+                    })->whereHas('quantities', function (Builder $builder) {
+                        return $builder->where('quantity', '>', 0);
+                    });
+                })->count(),
         ]);
     }
 
-    public function query()
+    public function query(): Builder
     {
         return $this->stock->stock_products()->getQuery();
     }

@@ -46,8 +46,10 @@ class ProductsImport implements WithHeadingRow, WithUpserts, WithStartRow, Skips
             }
 
             $parsed = Product::parseCode($row['kod_elsi']);
-            return Product::query()->create([
+
+            return Product::query()->firstOrCreate([
                 'elsie_code' => $row['kod_elsi'],
+            ], [
                 'name' => $row['naimenovanie'],
                 'size' => $row['razmer'],
                 'stock_code' => $row['kod_skladskoi'],

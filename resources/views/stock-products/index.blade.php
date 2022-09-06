@@ -22,79 +22,70 @@
             </li>
         </ol>
     </nav>
-    <h1>@yield('title')</h1>
+    <h1 class="mb-3">@yield('title')</h1>
 
-    <div class="row justify-content-between">
-        <div class="col-lg-auto mb-3 flex-grow-1">
-            <div class="input-group">
-                <span class="input-group-text"><x-ui::icon name="search"/></span>
-                <input type="search" placeholder="{{ __('Search Products') }}"
-                       class="form-control shadow-none" wire:model.debounce.500ms="search">
+    <div class="d-block">
+        <div class="flex-sm-wrap flex-md-nowrap row justify-content-between mb-3">
+            <div class="col-md-5 col-lg-4 col-sm-12 mb-3 mb-md-0">
+                <div class="input-group flex-nowrap">
+                        <span class="input-group-text">
+                            <i class="fa fa-barcode"></i>
+                        </span>
+                    <input type="search" placeholder="{{ __('Search by code') }}"
+                           class="form-control text-uppercase shadow-none" wire:model="code">
+
+                </div>
+            </div>
+            <div class="col-md-7 col-lg-8 col  col-sm-12 ">
+                <div class="input-group flex-nowrap">
+                        <span class="input-group-text">
+                            <i class="fa fa-shopping-bag text-secondary"></i>
+                        </span>
+                    <input type="search" placeholder="{{ __('Search by name') }}"
+                           class="form-control text-uppercase shadow-none" wire:model="name">
+                </div>
+            </div>
+        </div>
+        <div class="flex-sm-wrap flex-md-nowrap row justify-content-between mb-3">
+            <div class="col-md-5 col-lg-4 col-sm-12 mb-3 mb-md-0">
+                <div class="input-group flex-nowrap">
+                    <span class="input-group-text">
+                        <i class="fa fa-industry text-secondary"></i>
+                    </span>
+                    <select wire:model="manufacturerId" class="form-control shadow-none">
+                        <option value="0" class="text-muted">{{ __('All') }}</option>
+                        @forelse(\App\Models\Manufacturer::all() as $manufacturer)
+                            <option value="{{ $manufacturer->id }}">{{ $manufacturer->name }}</option>
+                        @empty
+                        @endforelse
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-7 col-lg-8 col  col-sm-12 ">
+                <div class="input-group flex-nowrap">
+                    <span class="input-group-text">
+                            <i class="fa fa-car text-secondary"></i>
+                    </span>
+                    <input type="search" placeholder="{{ __('Search by vehicle') }}" class="form-control text-uppercase shadow-none" wire:model="vehicle">
+                </div>
+            </div>
+        </div>
+        <div class="flex-sm-wrap flex-md-nowrap row justify-content-between mb-3">
+            <div class="col">
+            <div class="form-check form-switch">
+                <input class="form-check-input shadow-none" type="checkbox" id="show_filled" wire:model="showFilled">
+                <label class="form-check-label" for="show_filled">
+                    {{ __('Show only presented') }}
+                </label>
+            </div>
             </div>
         </div>
     </div>
 
     <div class="list-group mb-3">
-        @forelse($sProducts as $sProduct)
-            <div class="list-group-item list-group-item-action">
-                <div class="d-inline-flex align-items-center justify-content-between w-100">
-                    <div class="flex-grow-0 mb-2 mb-lg-0">
-                        <a href="{{ route('stock-products.show', ['stockProduct' => $sProduct]) }}"
-                           class="text-decoration-none text-dark">
-                        <ul class="list-unstyled mb-0">
-                            <li >
-                                <strong>{{ $sProduct->product->elsie_code }}</strong> - {{ $sProduct->product->name }}
-                            </li>
-                            <li>
-                                <small class="text-secondary">
-                                    {{ $sProduct->product->manufacturer ? $sProduct->product->manufacturer->name : 'null' }}
-                                </small>
-                            </li>
-                            @if($vehicle = $sProduct->product->vehicle)
-                                <li>
-                                    <small class="text-secondary">
-                                        {{ $vehicle->name }} ({{ $vehicle->year_start }}-{{ $vehicle->year_end }}
-                                        ) {{ implode(', ', $vehicle->bodytypes) }}
-                                    </small>
-                                </li>
-                            @endif
-                        </ul>
-                        </a>
-                    </div>
-                    <div class="d-inline-flex flex-shrink-1 text-center">
-                        @if($quantity = $sProduct->actual_quantity)
-                            <div class="d-block px-2">
-                                <div>
-                                    <strong class="text-primary">
-                                        {{ $quantity->quantity}}
-                                    </strong>
-                                    <span>{{ __($quantity->units) }}</span>
-                                </div>
-                                <div>
-                                    <small class="text-secondary">
-                                        {{ now()->sub($quantity->created_at)->diffForHumans() }}
-                                    </small>
-                                </div>
-                            </div>
-                        @endif
-                        @if($price = $sProduct->actual_price)
-                            <div class="d-block">
-                                <div>
-                                    <strong class="text-success">
-                                        {{ $price->price }}
-                                    </strong>
-                                    <span>{{ __($price->currency) }}</span>
-                                </div>
-                                <div>
-                                    <small class="text-secondary">
-                                        {{ now()->sub($price->created_at)->diffForHumans() }}
-                                    </small>
-                                    </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+        @forelse($stockProducts as $stockProduct)
+            <livewire:stock-products.item :stock-product="$stockProduct"
+                                          wire:key="stock_{{ $stockProduct->id }}_{{ now()->timestamp }}"/>
         @empty
             <div class="list-group-item">
                 {{ __('No results found.') }}
@@ -102,5 +93,5 @@
         @endforelse
     </div>
 
-    <x-ui::pagination :links="$sProducts"/>
+    <x-ui::pagination :links="$stockProducts"/>
 </div>

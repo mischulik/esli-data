@@ -29,17 +29,15 @@ class Show extends Component
     public function mount(Product $product)
     {
         $this->product = $product->exists ? $product : null;
-        optional($this->product->stocks()->pluck('id')->toArray() ?? null, function (array $stocks) {
-            Stock::query()->whereNotIn('id', $stocks)->get()->each(function (Stock $stock) {
-                $stock->stock_products()->create([
-                    'product_id' => $this->product->id,
-                ]);
-            });
-        });
 
-        $this->product->stock_products()->whereDoesntHave('quantities')->get()->each(function (StockProduct $stockProduct) {
+        foreach (Stock::all() as $stock) {
+            $stockProduct = StockProduct::query()->firstOrNew([
+                'stock_id' => $stock->id,
+                'product_id' => $product->id,
+            ]);
+            $stockProduct->save();
             GetStockProductInfoJob::dispatchSync($stockProduct);
-        });
+        }
     }
 
     public function route()
@@ -57,8 +55,10 @@ class Show extends Component
             }),
             'zeroProducts' => $this->product->stock_products()->whereDoesntHave('quantities')->get()->toBase(),
 
-            'actual_price' => optional($this->product->prices()->latest()->first() ?? null, function (StockProductPrice $price) {
-                return implode(' ', [$price->price, $price->currency]);
+            'actual_price' => optional($this->product->stock_products()->whereHas('prices')->latest()->first() ?? null, function (StockProduct $product) {
+                return optional($product->prices()->latest()->first() ?? null, function (StockProductPrice $price) {
+                    return implode(' ', [$price->price, $price->currency]);
+                });
             }),
         ]);
     }

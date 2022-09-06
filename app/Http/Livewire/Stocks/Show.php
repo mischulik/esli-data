@@ -3,9 +3,6 @@
 namespace App\Http\Livewire\Stocks;
 
 use App\Models\Stock;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
@@ -39,10 +36,6 @@ class Show extends Component
 
     public function query(): Builder
     {
-        return $this->stock->stock_products()->whereHas('prices', function (Builder $builder) {
-            return $builder->where('price', '>', 0);
-        })->whereHas('quantities', function (Builder $builder) {
-            return $builder->where('quantity', '>', 0);
-        })->getQuery();
+        return $this->stock->stock_products()->present()->getQuery();
     }
 }

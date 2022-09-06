@@ -35,15 +35,16 @@ class VehiclesImport implements ToModel, WithHeadingRow, WithUpserts, SkipsEmpty
         }
 
         return optional(Vehicle::query()->firstOrCreate([
-                'code' => $row['kod_modeli'],
-            ], [
-                'name' => $row['model'],
-                'bodytypes' => explode(',', $row['tipy_kuzova']),
-                'year_start' => $row['god_nacala_vypuska'],
-                'year_end' => $row['god_okoncaniya_vypuska'],
-                'full_name' => $this->getFullName($row),
-            ]) ?? null, function (Vehicle $vehicle) {
-
+            'code' => $row['kod_modeli'],
+        ], [
+            'name' => $row['model'],
+            'bodytypes' => collect(explode(',', $row['tipy_kuzova']))->map(function (string $type) {
+                return trim($type);
+            })->toArray(),
+            'year_start' => $row['god_nacala_vypuska'],
+            'year_end' => $row['god_okoncaniya_vypuska'],
+            'full_name' => $this->getFullName($row),
+        ]) ?? null, function (Vehicle $vehicle) {
             if ($vehicle->code === '3985') {
                 $vehicle->update([
                     'code' => '39B5',
@@ -96,10 +97,9 @@ class VehiclesImport implements ToModel, WithHeadingRow, WithUpserts, SkipsEmpty
             $row['model'],
             '(' . $row['tipy_kuzova'] . ')',
             '(' . implode('-', [
-                $row['god_nacala_vypuska'] ?? '',
-                $row['god_okoncaniya_vypuska'] ?? '',
+                    $row['god_nacala_vypuska'] ?? '',
+                    $row['god_okoncaniya_vypuska'] ?? '',
             ]) . ')',
         ]);
     }
-
 }

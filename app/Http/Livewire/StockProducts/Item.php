@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\StockProducts;
 
+use App\Actions\Data\StockProductInfoAction;
 use App\Jobs\GetStockProductInfoJob;
 use App\Models\Product;
 use App\Models\Stock;
@@ -21,6 +22,10 @@ class Item extends Component
 
     public function render()
     {
+        $this->quantity = optional($this->stockProduct->actual_quantity ?? null, function (StockProductQuantity $stockProductQuantity) {
+            return $stockProductQuantity->quantity > 0 ? $stockProductQuantity->quantity : -1;
+        }) ?? -1;
+
         return view('stock-products.item')->with([
             'stock' => optional($this->stockProduct->stock()->first() ?? null, function (Stock $stock) {
                 return $stock;
@@ -34,7 +39,9 @@ class Item extends Component
 
     public function getStockProductInfo()
     {
-        GetStockProductInfoJob::dispatch($this->stockProduct)->afterCommit();
+        StockProductInfoAction::run($this->stockProduct);
+
+//        GetStockProductInfoJob::dispatch($this->stockProduct);
         $actualQuantity = optional($this->stockProduct->getActualQuantityAttribute() ?? null, function (StockProductQuantity $stockProductQuantity) {
                 return $stockProductQuantity;
             }) ?? new StockProductQuantity([
