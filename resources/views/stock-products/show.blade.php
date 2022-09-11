@@ -1,14 +1,5 @@
 @section('title', $stockProduct->product->elsie_code.' - '.$stockProduct->stock->name)
 
-@push('styles')
-@endpush
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    @livewireChartsScripts
-@endpush
-
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -90,7 +81,7 @@
         </div>
     </div>
 
-    <livewire:stock-products.prices-chart :stock-product="$stockProduct" />
-    <livewire:stock-products.quantities-chart :stock-product="$stockProduct" />
+    @livewire(\App\Http\Livewire\StockProducts\PricesChart::class, ['stockProduct' => $stockProduct, 'title' => __('Price Dynamic')])
+    @livewire(\App\Http\Livewire\StockProducts\QuantitiesChart::class, ['stockProduct' => $stockProduct, 'title' => __('Quantities')])
 
 </div>

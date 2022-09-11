@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\StockProducts;
 
 use App\Actions\Data\StockProductInfoAction;
+use App\Jobs\GetStockProductInfoJob;
 use App\Models\StockProduct;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
@@ -14,6 +15,7 @@ class Show extends Component
     public function mount(StockProduct $stockProduct)
     {
         $this->stockProduct = $stockProduct;
+        StockProductInfoAction::run($stockProduct);
     }
 
     public function route()

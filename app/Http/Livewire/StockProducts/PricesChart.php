@@ -2,36 +2,16 @@
 
 namespace App\Http\Livewire\StockProducts;
 
-use App\Models\StockProduct;
+
+use App\Models\StockProductPrice;
 use Asantibanez\LivewireCharts\Models\LineChartModel;
-use Livewire\Component;
 
-class PricesChart extends Component
+class PricesChart extends LineChart
 {
-    public StockProduct $stockProduct;
-
-    public function mount(StockProduct $stockProduct)
+    public function getChartModel()
     {
-        $this->stockProduct = $stockProduct;
-    }
-
-    protected $listeners = [
-        '$refresh' => 'refresh',
-    ];
-
-    public function refresh()
-    {
-        $this->stockProduct->refresh();
-    }
-
-    public function render()
-    {
-        $prices = $this->stockProduct->prices()->get();
-        return view('stock-products.prices-chart')->with([
-            'lineChartModel' => $prices->reduce(function (LineChartModel $lineChartModel, $data) use ($prices) {
-//                $index = $prices->search($data);
-                return $lineChartModel->addPoint($data->created_at->diffForHumans(), $data->price);
-            }, new LineChartModel()),
-        ]);
+        return $this->stockProduct->prices()->get()->reduce(function (LineChartModel $lineChartModel, StockProductPrice $stockProductPrice ) {
+            return $lineChartModel->addPoint($stockProductPrice->created_at->diffForHumans(), $stockProductPrice->price);
+        }, (new LineChartModel())->setTitle($this->title));
     }
 }

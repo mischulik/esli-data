@@ -27,18 +27,31 @@
             <h1>@yield('title')</h1>
             <h4>{{ $product->name }}</h4>
         </div>
-        <div class="flex-shrink-1">
-            @isset($actual_price)
-                <h3 class="text-success">
-                    {{ $actual_price  }}
-                </h3>
-            @endisset
+        <div class="flex-shrink-1 text-center">
+{{--            @isset($actual_price)--}}
+{{--                <h3 class="text-success">--}}
+{{--                    {{ $actual_price  }}--}}
+{{--                </h3>--}}
+{{--                <small></small>--}}
+{{--            @endisset--}}
+            <h3 class>
+                <span class="text-success">
+                    {{ $actualPrice->price }}
+                </span>
+                <small class="text-muted fw-light">
+                    {{ $actualPrice->currency }}
+                </small>
+            </h3>
+            <small class="text-muted">
+                {{ $actualPrice->created_at->diffForHumans() }}
+            </small>
+
         </div>
     </div>
 
-    <div class="my-3 justify-content-around d-inline-flex w-100">
+    <div class="my-3 d-inline-flex w-100">
         @if($vehicle = $product->vehicle)
-            <a href="{{ route('vehicles.show', ['vehicle' => $vehicle]) }}" class="text-decoration-none">
+            <a href="{{ route('vehicles.show', ['vehicle' => $vehicle]) }}" class="text-decoration-none col" title="{{ __('View all products of :vehicleName', ['vehicleName' => $vehicle->full_name]) }}">
                 <div class="d-flex align-items-center text-secondary">
                     <div class="flex-shrink-0">
                         <i class="fa fa-2x fa-car-alt text-secondary"></i>
@@ -55,7 +68,7 @@
         @endif
 
         @if($manufacturer = $product->manufacturer)
-            <a href="{{ route('manufacturers.show', ['manufacturer' => $manufacturer]) }}" class="text-decoration-none">
+            <a href="{{ route('manufacturers.show', ['manufacturer' => $manufacturer]) }}" class="text-decoration-none col" title="{{ __('View all products by :manufacturerName', ['manufacturerName' => $manufacturer->name]) }}">
                 <div class="d-flex align-items-center text-secondary">
                     <div class="flex-shrink-0">
                         <i class="fas fa-2x fa-industry text-secondary"></i>
@@ -71,14 +84,13 @@
             </a>
         @endif
     </div>
+    <div class="list-group mb-3">
     @forelse($stockProducts as $stockProduct)
-        <livewire:stock-products.item :stockProduct="$stockProduct"
-                                      wire:key="{{ implode('_', [$stockProduct->id, 'stock-product', now()->timestamp]) }}"/>
+        <livewire:products.stock :stock-product="$stockProduct" />
     @empty
+        <div>
+            {{ __('No info available') }}
+        </div>
     @endforelse
-{{--    @forelse($zeroProducts as $zeroProduct)--}}
-{{--        <livewire:stock-products.item :stockProduct="$zeroProduct"--}}
-{{--                                      wire:key="{{ implode('_', [$zeroProduct->id, 'stock-product', now()->timestamp]) }}"/>--}}
-{{--    @empty--}}
-{{--    @endforelse--}}
+    </div>
 </div>

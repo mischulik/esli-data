@@ -53,13 +53,12 @@ class Show extends Component
             'stockProducts' => $this->product->stock_products()->whereHas('quantities')->get()->sortByDesc(function (StockProduct $stockProduct) {
                 return $stockProduct->actual_quantity->quantity;
             }),
-            'zeroProducts' => $this->product->stock_products()->whereDoesntHave('quantities')->get()->toBase(),
-
-            'actual_price' => optional($this->product->stock_products()->whereHas('prices')->latest()->first() ?? null, function (StockProduct $product) {
-                return optional($product->prices()->latest()->first() ?? null, function (StockProductPrice $price) {
-                    return implode(' ', [$price->price, $price->currency]);
-                });
-            }),
+            'actualPrice' => StockProduct::firstWhere('product_id', '=', $this->product->id)->prices()->latest()->first(),
+//            'actual_price' => optional($this->product->stock_products()->whereHas('prices')->latest()->first() ?? null, function (StockProduct $product) {
+//                return optional($product->prices()->latest()->first() ?? null, function (StockProductPrice $price) {
+//                    return implode(' ', [$price->price, $price->currency]);
+//                });
+//            }),
         ]);
     }
 
