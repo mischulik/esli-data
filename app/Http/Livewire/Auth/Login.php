@@ -3,31 +3,29 @@
 namespace App\Http\Livewire\Auth;
 
 use App\Actions\Auth\ElsieLoginAction;
-use App\Models\ElsieCredentials;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Bastinald\Ui\Traits\WithModel;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class Login extends Component
 {
     use WithModel;
 
-    public function route()
+    public function route(): \Illuminate\Routing\Route|array
     {
         return Route::get('/login', static::class)
             ->name('login')
             ->middleware('guest');
     }
 
-    public function render()
+    public function render(): Factory|View|Application
     {
         return view('auth.login');
     }
@@ -44,32 +42,24 @@ class Login extends Component
     {
         $this->validateModel();
 
-        $throttleKey = Str::lower($this->getModel('email')) . '|' . request()->ip();
-
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
-            $this->addError('email', __('auth.throttle', [
-                'seconds' => RateLimiter::availableIn($throttleKey),
-            ]));
-
-            return;
-        }
-
-        if (!Auth::attempt($this->getModel(['email', 'password']))) {
-            RateLimiter::hit($throttleKey);
-            $this->addError('email', __('auth.failed'));
-            return;
-        }
-
-
-        optional(\auth()->user() ?? null, function (User  $user) {
-            optional($user->elsie_credentials()->updateOrCreate([
+        $user = optional(User::whereHas('elsie_credentials', function (Builder $builder) {
+            $builder->where([
                 'email' => $this->model['email'],
-                'passwd' => $this->model['password']
-            ]) ?? null, function (ElsieCredentials  $credentials) {
-                ElsieLoginAction::make()->handle($credentials);
-            });
+                'passwd' => $this->model['password'],
+            ]);
+        })->first() ?? null, function (User $user) {
+            auth()->login($user);
+            return $user;
         });
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        if ($user) {
+            if (ElsieLoginAction::make()->handle()) {
+                return redirect()->intended(RouteServiceProvider::HOME);
+            }
+        }
+        return back()->withErrors([
+            'email' => 'Wrong',
+        ]);
     }
+
 }

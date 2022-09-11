@@ -20,6 +20,13 @@
                             </a>
                         </li>
                     @endif
+                    @if(\Illuminate\Support\Facades\Route::currentRouteName() !== 'stock-products')
+                    <li>
+                        <a href="{{ route('stocks.show', ['stock' => $stockProduct->stock]) }}" class="text-decoration-none" title="{{ __('To stock page') }}">
+                            {{ $stockProduct->stock->name }}
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </a>
         </div>

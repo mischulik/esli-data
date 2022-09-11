@@ -24,6 +24,10 @@ class User extends Authenticatable implements HasMedia
         'name', 'password', 'email',
     ];
 
+    protected $with = [
+        'elsie_credentials',
+    ];
+
     public function elsie_credentials(): HasOne
     {
         return $this->hasOne(ElsieCredentials::class, 'user_id', 'id');

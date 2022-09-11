@@ -35,18 +35,16 @@ class ElsieLoginAction extends CookieAction
         ])->post($this->url, $this->credentials->only([
             'email', 'passwd',
         ]));
+        $this->getCookies($response);
 
-        return $this->getCookies($response);
+        return $this->credentials->fresh()->cookie;
     }
 
     public function asCommand(Command $command)
     {
         optional($command->argument('userId') ?? null, function (string $userId) {
-            auth()->loginUsingId($userId);
-            optional(User::with('elsie_credentials')->find($userId) ?? null, function (User $user) {
-                $this->credentials = $user->elsie_credentials;
-                $this->handle();
-            });
+            $this->credentials = User::find($userId)->elsie_credentials;
+            $this->handle();
         });
     }
 }

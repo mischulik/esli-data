@@ -14,8 +14,12 @@ class ElsieSearchAction extends CookieAction
 
     public string $commandSignature = 'elsie:search {search}';
 
-    public function handle(string $search): ?array
+    public function handle(string $search, int $credentials = null): ?array
     {
+        if($credentials) {
+            $this->credentials = ElsieCredentials::find($credentials);
+        }
+
         $response = Http::withBody($this->getBody($search), 'application/x-www-form-urlencoded')
             ->withHeaders([
                 'Accept' => 'application/json, text/javascript, */*',

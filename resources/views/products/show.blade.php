@@ -76,9 +76,9 @@
                                       wire:key="{{ implode('_', [$stockProduct->id, 'stock-product', now()->timestamp]) }}"/>
     @empty
     @endforelse
-    @forelse($zeroProducts as $zeroProduct)
-        <livewire:stock-products.item :stockProduct="$zeroProduct"
-                                      wire:key="{{ implode('_', [$zeroProduct->id, 'stock-product', now()->timestamp]) }}"/>
-    @empty
-    @endforelse
+{{--    @forelse($zeroProducts as $zeroProduct)--}}
+{{--        <livewire:stock-products.item :stockProduct="$zeroProduct"--}}
+{{--                                      wire:key="{{ implode('_', [$zeroProduct->id, 'stock-product', now()->timestamp]) }}"/>--}}
+{{--    @empty--}}
+{{--    @endforelse--}}
 </div>

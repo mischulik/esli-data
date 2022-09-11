@@ -15,14 +15,14 @@ class DefaultUserSeeder extends Seeder
      */
     public function run(): void
     {
-//        User::factory()->afterCreating(function (User  $user) {
-//            $user->elsie_credentials()->create([
-//                'email' => 'avtosteklozp@i.ua',
-//                'passwd' => '8db9c421',
-//            ]);
-//        })->create([
-//            'email' => 'avtosteklozp@i.ua',
-//            'password' => '8db9c421',
-//        ]);
+        User::factory()->afterCreating(function (User  $user) {
+            $user->elsie_credentials()->create([
+                'email' => 'avtosteklozp@i.ua',
+                'passwd' => '8db9c421',
+            ]);
+        })->create([
+            'email' => 'avtosteklozp@i.ua',
+            'password' => '8db9c421',
+        ]);
     }
 }

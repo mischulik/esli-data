@@ -95,7 +95,7 @@ class StockProduct extends Pivot
         return $this->hasMany(StockProductPrice::class, 'stock_product_id', 'id');
     }
 
-    public function getActualPriceAttribute(): HasMany
+    public function getActualPriceAttribute()
     {
         return $this->prices()->latest()->first();
     }

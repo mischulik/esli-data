@@ -35,7 +35,9 @@ class Index extends Component
     public function render()
     {
         return view('products.index', [
-            'products' => $this->query()->whereHas('latestPrice')
+            'products' =>
+                $this->query()
+//                    ->whereHas('latestPrice')
                 ->paginate(),
         ]);
     }
