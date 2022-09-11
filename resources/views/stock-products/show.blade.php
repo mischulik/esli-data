@@ -4,7 +4,9 @@
 @endpush
 
 @push('scripts')
-    <script src="//unpkg.com/alpinejs"></script>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    @livewireChartsScripts
 @endpush
 
 <div>
@@ -88,18 +90,7 @@
         </div>
     </div>
 
-    @forelse($stockProduct->quantities as $quantity)
-        <div>
-            {{ $quantity->quantity }}
-        </div>
-    @empty
-    @endforelse
-
-    @forelse($stockProduct->prices as $price)
-        <div>
-            {{ $price->price }}
-        </div>
-    @empty
-    @endforelse
+    <livewire:stock-products.prices-chart :stock-product="$stockProduct" />
+    <livewire:stock-products.quantities-chart :stock-product="$stockProduct" />
 
 </div>

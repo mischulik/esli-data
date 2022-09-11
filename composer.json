@@ -10,7 +10,7 @@
   "require": {
     "php": "^8.0",
     "ext-curl": "*",
-    "asantibanez/livewire-charts": "^v2.4.1",
+    "asantibanez/livewire-charts": "^2.4",
     "bastinald/laravel-livewire-loader": "^2.2.2",
     "bastinald/laravel-livewire-toasts": "^3.0.0",
     "bastinald/ui": "^2.2.2",
