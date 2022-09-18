@@ -31,55 +31,7 @@
         </ol>
     </nav>
 
-    <div class="d-inline-flex justify-content-md-between align-items-center w-100 mb-5">
-        <div class="flex-grow-1">
-            <h1>@yield('title')</h1>
-            <h5>{{ $stockProduct->product->name }}</h5>
-            @if($vehicle = $stockProduct->product->vehicle)
-            <h6>{{ $vehicle->full_name }}</h6>
-            @endif
-        </div>
-        <div class="flex-fill justify-content-end">
-            @if($actualPrice = $stockProduct->actual_price)
-                <div class="d-block mb-1">
-                    <div class="d-flex justify-content-between" title="{{now()->sub($actualPrice->created_at)->longRelativeToNowDiffForHumans() }}">
-                        <small class="text-secondary">
-                            {{ __('Last known price') }}
-                        </small>
-                        <strong class="text-success">
-                            {{ $actualPrice->price }} {{ $actualPrice->currency }}
-                        </strong>
-                    </div>
-                </div>
-            @endif
-            @if($actualQuantity = $stockProduct->actual_quantity)
-                <div class="d-block mb-1">
-                    <div class="d-flex justify-content-between"
-                         title="{{ now()->sub($actualQuantity->created_at)->shortRelativeToNowDiffForHumans() }}">
-                        <small class="text-secondary">
-                            {{ __('Last known quantity') }}
-                        </small>
-                        <strong class="text-primary">
-                            {{ $actualQuantity->quantity }}
-                        </strong>
-                    </div>
-                </div>
-            @endif
-            <div class="d-block mb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">{{ __('For fresh data click') }}</small>
-                    <a type="button" class="btn btn-link text-decoration-none" wire:loading.class="disabled"
-                       wire:click="getStockProductInfo">
-                        <div class="spinner-border visually-hidden" role="status"
-                             wire:loading.class.remove="visually-hidden"
-                             wire:loading.target="getStockProductInfo">
-                        </div>
-                        <i class="fa fa-2x fa-sync" wire:loading.class="visually-hidden"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <livewire:stock-products.header :stockProduct="$stockProduct" />
 
     @livewire(\App\Http\Livewire\StockProducts\PricesChart::class, ['stockProduct' => $stockProduct, 'title' => __('Price Dynamic')])
     @livewire(\App\Http\Livewire\StockProducts\QuantitiesChart::class, ['stockProduct' => $stockProduct, 'title' => __('Quantities')])

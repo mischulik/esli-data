@@ -62,8 +62,7 @@
 
     <div class="list-group mb-3">
         @forelse($products as $product)
-            <livewire:products.item :product="$product"
-                                    wire:key="{{ implode('_', ['product', $loop->index, $product->id]) }}"/>
+            <livewire:products.item :product="$product" wire:key="{{ implode('_', ['product', $loop->index, $product->id]) }}"/>
         @empty
             <div class="list-group-item text-center">
                 {{ __('No results found.') }}

@@ -20,7 +20,7 @@ class Item extends Component
     {
         return view('products.item')->with([
             'price' => optional(Route::current()->parameter('stock') ?? null, function (Stock $stock) {
-                return $this->priceForStock($stock);
+//                return $this->priceForStock($stock);
             }),
             'quantity' => optional(Route::current()->parameter('stock') ?? null, function (Stock $stock) {
                 return $this->quantityForStock($stock);
