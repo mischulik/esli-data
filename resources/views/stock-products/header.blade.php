@@ -1,7 +1,9 @@
 <div class="d-block">
     <div class="d-inline-flex justify-content-between align-items-center w-100">
         <div class="flex-grow-1">
-            <h1>{{ $stockProduct->product->elsie_code }} - {{ $stockProduct->stock->name }}</h1>
+            <h1>
+                {{ $stockProduct->product->elsie_code }} - {{ $stockProduct->stock->name }}
+            </h1>
             <p class="fs-3">{{ $stockProduct->product->name }}</p>
         </div>
         <div class="flex-shrink-0 text-end">

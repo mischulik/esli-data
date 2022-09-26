@@ -4,35 +4,28 @@
         <div class="d-inline-flex align-items-center justify-content-between w-100 py-2">
             <div class="flex-grow-1">
                 <strong class="text-dark">
-                    {{ $stock->name }}
+                    {{ $stockProduct->stock->name }}
                 </strong>
             </div>
-            @if($stockProduct->actualPrice->price)
-                <div class="flex-shrink-0">
-                    <strong class="text-success">
-                        {{ $stockProduct->actualPrice->price }}
-                    </strong>
-                    <small class="text-muted">
-                        {{ $stockProduct->actualPrice->currency }}
-                    </small>
-                </div>
-            @endif
-            @if($stockProduct->actualQuantity->quantity)
+            <div class="flex-shrink-0">
+                <strong class="text-success">
+                    {{ $stockProduct->product->actual_price->price }}
+                </strong>
+                <small class="text-muted">
+                    {{ $stockProduct->product->actual_price->currency }}
+                </small>
+            </div>
                 <div class="flex-shrink-0">
                 <span class="mx-2">
                     <span class="text-primary fw-bold">
-                        {{ $stockProduct->actualQuantity->quantity }}
+                        {{ $stockProduct->actual_quantity->quantity }}
                     </span>
-                    <span class="text-muted">{{ __($stockProduct->actualQuantity->units) }}</span>
+                    <span class="text-muted">{{ __($stockProduct->actual_quantity->units) }}</span>
                 </span>
                     <i class="fas fa-history text-success"
-                       title="{{ $stockProduct->actualQuantity->created_at->diffForHumans() }}"></i>
+                       title="{{ $stockProduct->actual_quantity->created_at->diffForHumans() }}">
+                    </i>
                 </div>
-            @else
-                <button class="btn btn-primary shadow-none" wire:click="$refresh()">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            @endif
         </div>
     </a>
 </div>

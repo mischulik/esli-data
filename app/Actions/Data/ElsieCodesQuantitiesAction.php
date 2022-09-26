@@ -20,7 +20,6 @@ class ElsieCodesQuantitiesAction
         ElsieTrashAction::run($codes, true);
         $trash = ElsieShowTrashAction::run($codes);
         ElsieRemoveFromTrashAction::run($codes);
-//        ElsieTrashAction::run($codes);
 
         return $this->parseTrash($trash, $codes);
     }

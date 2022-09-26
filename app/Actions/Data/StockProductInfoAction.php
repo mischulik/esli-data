@@ -14,7 +14,7 @@ class StockProductInfoAction
     //Using for One StockProduct object
     public function handle(StockProduct $stockProduct)
     {
-        return optional($stockProduct->getTrashCodeAttribute() ?? null, function (string $trachCode) {
+        return optional($stockProduct->trash_code ?? null, function (string $trachCode) {
             return ElsieCodesQuantitiesAction::run([$trachCode]);
         });
     }

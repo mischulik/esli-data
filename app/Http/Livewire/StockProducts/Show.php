@@ -26,6 +26,7 @@ class Show extends Component
 
     public function render()
     {
+        $this->getStockProductInfo();
         $this->stockProduct->refresh();
         return view('stock-products.show')->with([]);
     }
