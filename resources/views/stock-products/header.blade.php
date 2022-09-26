@@ -5,16 +5,14 @@
             <p class="fs-3">{{ $stockProduct->product->name }}</p>
         </div>
         <div class="flex-shrink-0 text-end">
-            @if($actualPrice = $stockProduct->prices()->latest()->first())
-                <div>
-                <strong class="text-success fs-3" title="{{ $actualPrice->created_at->diffForHumans() }}">
-                    {{ $actualPrice->price }}
+            <div>
+                <strong class="text-success fs-3" title="{{ $stockProduct->product->actual_price->created_at->diffForHumans() }}">
+                    {{ $stockProduct->product->actual_price->price }}
                 </strong>
                 <small class="text-muted fw-light">
-                    {{ $actualPrice->currency }}
+                    {{ $stockProduct->product->actual_price->currency }}
                 </small>
-                </div>
-            @endif
+            </div>
             @if($actualQuantity = $stockProduct->quantities()->latest()->first())
                 <div>
                 <strong class="text-primary fs-3" title="{{ $actualQuantity->created_at->diffForHumans() }}">

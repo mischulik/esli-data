@@ -5,16 +5,12 @@
             <p class="fs-3">{{ $product->name }}</p>
         </div>
         <div class="flex-shrink-0 text-end">
-            @if($stockProduct = $product->stock_products()->first())
-                @if($actualPrice = $stockProduct->prices()->latest()->first())
-                    <strong class="text-success fs-3" title="{{ $actualPrice->created_at->diffForHumans() }}">
-                        {{ $actualPrice->price }}
+                    <strong class="text-success fs-3" title="{{ $product->actual_price->created_at->diffForHumans() }}">
+                        {{ $product->actual_price->price }}
                     </strong>
                     <small class="text-muted fw-light">
-                        {{ $actualPrice->currency }}
+                        {{ $product->actual_price->currency }}
                     </small>
-                @endif
-            @endif
         </div>
     </div>
     <div class="my-3 row">

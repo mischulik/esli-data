@@ -3,37 +3,32 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Kirschbaum\PowerJoins\PowerJoins;
-use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Illuminate\Support\Carbon;
 
-class StockProduct extends Pivot
+class StockProduct extends Model
 {
     use HasFactory;
-    use PowerJoins;
-    use HasRelationships;
 
     protected $table = 'stock_products';
-
-    public $incrementing = true;
 
     protected $fillable = [
         'stock_id',
         'product_id',
     ];
 
+    protected $with = [
+        'actual_quantity',
+    ];
+
     public function scopePresent(Builder $builder)
     {
         $builder->where(function (Builder $builder) {
-            $builder->whereHas('prices', function (Builder $builder) {
-                return $builder->where('price', '>', 0);
-            })->whereHas('quantities', function (Builder $builder) {
-                return $builder->where('quantity', '>', 0);
+            $builder->whereHas('quantities', function (Builder $builder) {
+                return $builder->where('quantity', '>', 0)->whereNotNull('quantity');
             });
         });
     }
@@ -90,27 +85,21 @@ class StockProduct extends Pivot
         return $this->belongsTo(Stock::class, 'stock_id', 'id');
     }
 
-    public function prices(): HasMany
-    {
-        return $this->hasMany(StockProductPrice::class, 'stock_product_id', 'id');
-    }
-
-    public function getActualPriceAttribute()
-    {
-        return $this->prices()->latest()->first();
-    }
-
     public function quantities(): HasMany
     {
         return $this->hasMany(StockProductQuantity::class, 'stock_product_id', 'id');
     }
 
-    public function getActualQuantityAttribute(): Model|HasMany|null
+    public function actual_quantity()
     {
-        return $this->quantities()->latest()->first();
+        return $this->hasOne(StockProductQuantity::class, 'stock_product_id', 'id')->latestOfMany()->withDefault([
+            'quantity' => 0,
+            'units' => 'pcs',
+            'created_at' => Carbon::minValue(),
+        ]);
     }
 
-    public function resolveRouteBinding($value, $field = null): Model|Collection|Builder|array|null
+    public function resolveRouteBinding($value, $field = null)
     {
         return self::query()->find($value);
     }

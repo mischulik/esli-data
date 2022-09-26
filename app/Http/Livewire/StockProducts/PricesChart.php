@@ -3,15 +3,15 @@
 namespace App\Http\Livewire\StockProducts;
 
 
-use App\Models\StockProductPrice;
+use App\Models\ProductPrice;
 use Asantibanez\LivewireCharts\Models\LineChartModel;
 
 class PricesChart extends LineChart
 {
     public function getChartModel()
     {
-        return $this->stockProduct->prices()->get()->reduce(function (LineChartModel $lineChartModel, StockProductPrice $stockProductPrice ) {
-            return $lineChartModel->addPoint($stockProductPrice->created_at->diffForHumans(), $stockProductPrice->price);
+        return $this->stockProduct->product->prices()->get()->reduce(function (LineChartModel $lineChartModel, ProductPrice $productPrice ) {
+            return $lineChartModel->addPoint($productPrice->created_at->diffForHumans(), $productPrice->price);
         }, (new LineChartModel())->setTitle($this->title));
     }
 }

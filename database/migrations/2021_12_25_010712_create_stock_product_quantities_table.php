@@ -30,6 +30,8 @@ class CreateStockProductQuantitiesTable extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('stock_product_quantities');
+        Schema::enableForeignKeyConstraints();
     }
 }

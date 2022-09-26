@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-//use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-//use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -32,20 +31,9 @@ class Product extends Model implements HasMedia
         'note',
     ];
 
-//    public static function booted()
-//    {
-//        static::created(function (Product $product) {
-//            $product->stock_products()->createMany(Stock::all()->pluck('id')->map(function (int $id) {
-//                return [
-//                    'stock_id' => $id,
-//                ];
-//            })->toArray());
-//
-//            $product->stock_products()->get()->each(function (StockProduct $stockProduct) {
-//                StockProductInfoAction::run($stockProduct);
-//            });
-//        });
-//    }
+    protected $with = [
+        'actual_price',
+    ];
 
     public function scopeDefected(Builder $builder)
     {
@@ -91,7 +79,7 @@ class Product extends Model implements HasMedia
 
     public function stocks(): BelongsToMany
     {
-        return $this->belongsToMany(Stock::class, StockProduct::class, 'product_id', 'stock_id', 'id', 'id');
+        return $this->belongsToMany(Stock::class, 'stock_products', 'product_id', 'stock_id', 'id', 'id');
     }
 
     public function vehicle(): BelongsTo
@@ -107,5 +95,19 @@ class Product extends Model implements HasMedia
     public function stock_products(): HasMany
     {
         return $this->hasMany(StockProduct::class, 'product_id', 'id');
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(ProductPrice::class, 'product_id', 'id')->orderBy('id');
+    }
+
+    public function actual_price()
+    {
+        return $this->hasOne(ProductPrice::class, 'product_id', 'id')->latestOfMany()->withDefault([
+            'price' => 0,
+            'currency' => 'UAH',
+            'created_at' => Carbon::minValue(),
+        ]);
     }
 }

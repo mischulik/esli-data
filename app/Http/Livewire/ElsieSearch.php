@@ -64,9 +64,8 @@ class ElsieSearch extends Component
                 $builder->where('name', 'like', '%' . $this->nameSearch . '%');
             })->whereHas('stock_products', function(Builder $builder) {
                 $builder
-                    ->whereHas('quantities')
-                    ->whereHas('prices');
-            });
+                    ->whereHas('quantities');
+            })->whereHas('prices');
         });
     }
 }

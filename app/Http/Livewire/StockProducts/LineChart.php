@@ -15,19 +15,9 @@ class LineChart extends Component
         '$refresh' => 'refresh',
     ];
 
-    public function refresh()
-    {
-        $this->stockProduct->refresh();
-    }
-
-    public function mount(StockProduct $stockProduct, string $title)
-    {
-        $this->stockProduct = $stockProduct;
-        $this->title = $title;
-    }
-
     public function render()
     {
+        $this->stockProduct->refresh();
         return view('stock-products.line-chart')->with([
             'lineChartModel' => $this->getChartModel(),
         ]);

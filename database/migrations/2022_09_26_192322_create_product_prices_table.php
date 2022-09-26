@@ -1,12 +1,11 @@
 <?php
 
-use App\Models\Price;
-use App\Models\StockProduct;
+use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStockProductPricesTable extends Migration
+class CreateProductPricesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,9 +14,9 @@ class CreateStockProductPricesTable extends Migration
      */
     public function up()
     {
-        Schema::create('stock_product_prices', function (Blueprint $table) {
+        Schema::create('product_prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(StockProduct::class, 'stock_product_id')->constrained('stock_products')->cascadeOnDelete();
+            $table->foreignIdFor(Product::class, 'product_id')->constrained('products')->cascadeOnDelete();
             $table->unsignedBigInteger('price')->default(0)->index();
             $table->string('currency')->default('UAH');
             $table->timestamps();
@@ -31,6 +30,8 @@ class CreateStockProductPricesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stock_product_prices');
+        Schema::disableForeignKeyConstraints();
+        Schema::dropIfExists('product_prices');
+        Schema::enableForeignKeyConstraints();
     }
 }

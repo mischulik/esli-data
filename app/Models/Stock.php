@@ -29,7 +29,7 @@ class Stock extends Model implements HasMedia
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, StockProduct::class, 'stock_id', 'product_id', 'id', 'id');
+        return $this->belongsToMany(Product::class, 'stock_products', 'stock_id', 'product_id', 'id', 'id');
     }
 
     public function scopeFilled(Builder $builder)

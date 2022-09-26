@@ -140,20 +140,21 @@ class ElsieVehicleProductsPricesAction
 
                 $product->save();
 
+                optional($pData['price'] ?? null, function($price) use ($product) {
+                    $product->prices()->create([
+                        'price' => $price,
+                    ]);
+                });
+
                 return optional($pData['stock'] ?? null, function ($shopId) use ($product, $pData) {
                     $stock = optional(Stock::query()->firstWhere('shop_id', '=', $shopId) ?? null, function (Stock $stock) {
                         return $stock;
                     });
 
-                    return optional(StockProduct::query()->firstOrCreate([
+                    return StockProduct::query()->firstOrCreate([
                             'stock_id' => $stock->id,
                             'product_id' => $product->id,
-                        ]) ?? null, function (StockProduct $stockProduct) use ($pData) {
-                        $stockProduct->prices()->create([
-                            'price' => $pData['price'],
                         ]);
-                        return $stockProduct;
-                    });
                 });
             });
         })->filter(function ($item) {

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Actions\Download\ElsiePriceDownloadAction;
 use App\Imports\PriceImport;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 use Maatwebsite\Excel\Facades\Excel;

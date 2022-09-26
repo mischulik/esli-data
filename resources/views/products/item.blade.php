@@ -58,48 +58,7 @@
                 </ul>
             </div>
             <div class="col-lg-auto text-center">
-                @if($stockProduct = $product->stock_products->first())
-                @if($price = $stockProduct->prices()->latest()->first())
-                    <div>
-                        <strong class="text-success">{{ $price->price }}</strong> <small class="text-success">{{ __($price->currency) }}</small>
-                    </div>
-                @endif
-                @if(is_a($quantity, \App\Models\StockProductQuantity::class))
-                    <div>
-                    <strong class="text-primary">{{ $quantity->quantity }}</strong> <small class="text-primary">{{ __($quantity->units) }}</small>
-                    </div>
-                @endif
-                @endif
-
-                {{--                            <li>--}}
-                {{--                @forelse($product->stock_products()->get() as $stockProduct)--}}
-                {{--                    <div>--}}
-                {{--                        <strong class="text-primary">--}}
-                {{--                            {{ $stockProduct->stock->name }} @if($quantity = $stockProduct->actual_quantity())--}}
-                {{--                                ({{ $quantity->quantity }})@endif--}}
-                {{--                        </strong>--}}
-                {{--                        @if($price = $stockProduct->actual_price)--}}
-                {{--                            <strong class="text-success">--}}
-                {{--                                {{ $price->price }} {{__('UAH')}}--}}
-                {{--                            </strong>--}}
-                {{--                            <small class="text-secondary">--}}
-                {{--                                {{ now()->sub($price->created_at)->diffForHumans() }}--}}
-                {{--                            </small>--}}
-                {{--                        @endif--}}
-                {{--                    </div>--}}
-                {{--                @empty--}}
-                {{--                    <small class="text-danger">{{ __('Not found at stocks') }}</small>--}}
-                {{--                @endforelse--}}
-                {{--                            </li>--}}
-
-                {{--                <x-ui::action icon="eye" :title="__('Read')"--}}
-                {{--                              click="$emit('showModal', 'products.read', {{ $product->id }})"/>--}}
-
-                {{--                <x-ui::action icon="pencil-alt" :title="__('Update')"--}}
-                {{--                              click="$emit('showModal', 'products.save', {{ $product->id }})"/>--}}
-
-                {{--                <x-ui::action icon="trash-alt" :title="__('Delete')" click="delete({{ $product->id }})"--}}
-                {{--                              onclick="confirm('{{ __('Are you sure?') }}') || event.stopImmediatePropagation()"/>--}}
+                <strong class="text-success">{{ $product->actual_price->price }}</strong> <small class="text-success">{{ __($product->actual_price->currency) }}</small>
             </div>
         </div>
     </div>

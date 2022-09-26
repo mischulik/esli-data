@@ -3,7 +3,6 @@
 namespace App\Http\Livewire\StockProducts;
 
 use App\Actions\Data\StockProductInfoAction;
-use App\Jobs\GetStockProductInfoJob;
 use App\Models\StockProduct;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
@@ -27,14 +26,13 @@ class Show extends Component
 
     public function render()
     {
+        $this->stockProduct->refresh();
         return view('stock-products.show')->with([]);
     }
 
     public function getStockProductInfo()
     {
         StockProductInfoAction::run($this->stockProduct);
-
-        $this->stockProduct->refresh();
         $this->emit('$refresh');
     }
 }

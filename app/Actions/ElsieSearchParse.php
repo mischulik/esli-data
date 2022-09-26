@@ -5,9 +5,7 @@ namespace App\Actions;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\StockProduct;
-use App\Models\StockProductPrice;
 use App\Models\StockProductQuantity;
-use App\Models\Vehicle;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class ElsieSearchParse
@@ -30,7 +28,7 @@ class ElsieSearchParse
         $parsed = collect(explode('-', collect(explode('.', $searchResult[0]))->first()))->last();
         $manufacturer = Product::suggestedManufacturer($parsed);
 
-        $product = Product::firstOrCreate([
+        $product = Product::query()->firstOrCreate([
             'elsie_code' => $searchResult[0],
         ], [
             'name' => $searchResult[2],
@@ -43,20 +41,19 @@ class ElsieSearchParse
         ]);
 
 
-        if ($stock = Stock::firstWhere([
+        if ($stock = Stock::query()->firstWhere([
                 'shop_id' => $searchResult[5],
             ])) {
-            $stockProduct = StockProduct::firstOrCreate([
+            $stockProduct = StockProduct::query()->firstOrCreate([
                 'stock_id' => $stock->id,
                 'product_id' => $product->id,
             ]);
 
-            StockProductPrice::create([
-                'stock_product_id' => $stockProduct->id,
+            $product->prices()->create([
                 'price' => $searchResult[3],
             ]);
 
-            StockProductQuantity::create([
+            StockProductQuantity::query()->create([
                 'stock_product_id' => $stockProduct->id,
                 'quantity' => $searchResult[16],
             ]);

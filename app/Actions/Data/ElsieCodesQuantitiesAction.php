@@ -2,8 +2,9 @@
 
 namespace App\Actions\Data;
 
+use App\Models\Product;
+use App\Models\Stock;
 use App\Models\StockProduct;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\AsJob;
@@ -85,30 +86,31 @@ class ElsieCodesQuantitiesAction
                 return in_array($code, $codes) ? $code : null;
             });
 
-            return
-                is_string($trachCode)
-                    ? optional(StockProduct::query()
-                        ->whereHas('stock', function (Builder $builder) use ($item) {
-                            return $builder->where('shop_id', '=', $item['stock']);
-                        })->whereHas('product', function (Builder $builder) use ($item) {
-                            return $builder->where('elsie_code', '=', $item['elsie_code']);
-                        })->first() ?? null, function (StockProduct $stockProduct) use ($item) {
-                    if (is_string($item['price'])) {
-                        $stockProduct->prices()->create([
-                            'price' => $item['price'],
-                        ]);
+            if ($product = Product::query()->whereElsieCode($item['elsie_code'])->first()) {
+                if(is_string($item['price'])) {
+                    $product->prices()->create([
+                        'price' => $item['price'],
+                    ]);
+                }
+
+                if ($stock = Stock::query()->whereShopId($item['stock'])->first()) {
+                    if ($stockProduct = StockProduct::query()->firstOrCreate([
+                        'stock_id' => $stock->id,
+                        'product_id' => $product->id,
+                    ])) {
+                        if (is_string($item['quantity'])) {
+                            $stockProduct->quantities()->create([
+                                'quantity' => $item['quantity'],
+                            ]);
+                        }
+                        return $stockProduct;
                     }
-                    if (is_string($item['quantity'])) {
-                        $stockProduct->quantities()->create([
-                            'quantity' => $item['quantity'],
-                        ]);
-                    }
-                    return $stockProduct;
-                })
-                    : null;
+                }
+                return null;
+            }
+            return null;
         })->filter(function ($item) {
             return is_a($item, StockProduct::class);
         });
     }
-
 }

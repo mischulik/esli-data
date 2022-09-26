@@ -10,19 +10,14 @@ class Header extends Component
 {
     public StockProduct $stockProduct;
 
-    public function mount(StockProduct $stockProduct)
-    {
-        $this->stockProduct = $stockProduct;
-    }
-
     public function render()
     {
+        $this->stockProduct->refresh();
         return view('stock-products.header');
     }
 
     public function getInfo()
     {
         StockProductInfoAction::run($this->stockProduct);
-        $this->stockProduct->refresh();
     }
 }
