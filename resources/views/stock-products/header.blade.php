@@ -13,16 +13,14 @@
                     {{ $stockProduct->product->actual_price->currency }}
                 </small>
             </div>
-            @if($actualQuantity = $stockProduct->quantities()->latest()->first())
-                <div>
-                <strong class="text-primary fs-3" title="{{ $actualQuantity->created_at->diffForHumans() }}">
-                        {{ $actualQuantity->quantity }}
+            <div>
+                <strong class="text-primary fs-3" title="{{ $stockProduct->actual_quantity->created_at->diffForHumans() }}">
+                        {{ $stockProduct->actual_quantity->quantity }}
                 </strong>
                 <small class="text-muted fw-light">
-                    {{ __('шт') }}
+                    {{ __($stockProduct->actual_quantity->units) }}
                 </small>
-                </div>
-            @endif
+            </div>
             <div class="d-flex">
                 <button class="flex-grow-1 btn btn-primary shadow-none" wire:click="getInfo" title="{{ __('Refresh data') }}" wire:loading.class="disabled">
                     <i class="fas fa-sync-alt"></i>
