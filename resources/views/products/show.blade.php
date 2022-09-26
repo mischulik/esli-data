@@ -25,7 +25,7 @@
     <livewire:products.header :product="$product" />
 
     <div class="list-group mb-3">
-    @forelse($stockProducts as $stockProduct)
+    @forelse($product->stock_products as $stockProduct)
         <livewire:products.stock :stock-product="$stockProduct" />
     @empty
         <div>

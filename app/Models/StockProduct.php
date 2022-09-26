@@ -3,20 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Kirschbaum\PowerJoins\PowerJoins;
-use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Illuminate\Support\Carbon;
 
 class StockProduct extends Pivot
 {
     use HasFactory;
-    use PowerJoins;
-    use HasRelationships;
 
     protected $table = 'stock_products';
 
@@ -25,6 +22,11 @@ class StockProduct extends Pivot
     protected $fillable = [
         'stock_id',
         'product_id',
+    ];
+
+    protected $with = [
+        'actualPrice',
+        'actualQuantity',
     ];
 
     public function scopePresent(Builder $builder)
@@ -95,9 +97,12 @@ class StockProduct extends Pivot
         return $this->hasMany(StockProductPrice::class, 'stock_product_id', 'id');
     }
 
-    public function getActualPriceAttribute()
+    public function actualPrice(): HasOne
     {
-        return $this->prices()->latest()->first();
+        return $this->hasOne(StockProductPrice::class, 'stock_product_id', 'id')->latestOfMany()->withDefault([
+            'price' => 0,
+            'created_at' => Carbon::minValue(),
+        ]);
     }
 
     public function quantities(): HasMany
@@ -105,12 +110,15 @@ class StockProduct extends Pivot
         return $this->hasMany(StockProductQuantity::class, 'stock_product_id', 'id');
     }
 
-    public function getActualQuantityAttribute(): Model|HasMany|null
+    public function actualQuantity()
     {
-        return $this->quantities()->latest()->first();
+        return $this->hasOne(StockProductQuantity::class, 'stock_product_id', 'id')->latestOfMany()->withDefault([
+            'quantity' => 0,
+            'created_at' => Carbon::minValue(),
+        ]);
     }
 
-    public function resolveRouteBinding($value, $field = null): Model|Collection|Builder|array|null
+    public function resolveRouteBinding($value, $field = null)
     {
         return self::query()->find($value);
     }
