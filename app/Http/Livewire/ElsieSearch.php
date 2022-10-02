@@ -2,9 +2,10 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\ElsieCredentials;
+use App\Actions\Data\ElsieSearchAction;
+use App\Actions\ElsieSaveFound;
+use App\Actions\ElsieSearchParse;
 use App\Models\Product;
-use App\Models\Stock;
 use App\Models\StockProduct;
 use Bastinald\Ui\Traits\WithModel;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,56 +17,29 @@ class ElsieSearch extends Component
     use WithModel;
     use WithPagination;
 
-    public ElsieCredentials $elsieCredentials;
+    public string $code = '';
+    public string $descr = '';
+    public $searchResults;
 
-    public string $codeSearch;
-    public string $nameSearch;
-
-    protected $listeners = [
-        '$search' => 'search',
-        '$refresh',
-    ];
-
-    public function mount(ElsieCredentials $elsieCredentials = null, string $codeSearch = '', string $nameSearch = '')
+    public function updated()
     {
-        $this->elsieCredentials = $elsieCredentials;
-        $this->codeSearch = $codeSearch ?? request()->query('code', '');
-        $this->nameSearch = $nameSearch ?? request()->query('name', '');
+        $data = (strlen($this->code) > 4 || strlen($this->descr)) ? ElsieSearchAction::make()->handle([
+            'code' => $this->code,
+            'descr' => $this->descr,
+        ]) : null;
 
-        $this->fill([
-            'codeSearch' => $this->codeSearch,
-            'nameSearch' => $this->nameSearch,
-        ]);
+        if ($data) {
+            collect($data)->each(function (array $item) {
+                $item['vehicle_id'] = null;
+                ElsieSaveFound::run(ElsieSearchParse::run($item));
+            });
+            $this->emit('$refresh');
+        }
     }
 
     public function render()
     {
-        return view('elsie-search')->with([
-            'code' => $this->codeSearch,
-            'name' => $this->nameSearch,
-            'results' => $this->query()->paginate(),
-        ]);
-    }
-
-    public function search()
-    {
-        $this->resetPage();
-        $this->emit('$refresh');
-    }
-
-    public function query()
-    {
-        $this->codeSearch = '3003';
-
-        return Stock::query()->whereHas('products', function (Builder $builder) {
-            $builder->when(!empty($this->codeSearch), function (Builder $builder) {
-                $builder->where('elsie_code', 'like', $this->codeSearch . '%');
-            })->when(!empty($this->nameSearch), function (Builder $builder) {
-                $builder->where('name', 'like', '%' . $this->nameSearch . '%');
-            })->whereHas('stock_products', function(Builder $builder) {
-                $builder
-                    ->whereHas('quantities');
-            })->whereHas('prices');
-        });
+        $this->searchResults = strlen($this->code) > 4 ? Product::query()->where('elsie_code', 'like', $this->code.'%')->get() : [];
+        return view('elsie-search');
     }
 }

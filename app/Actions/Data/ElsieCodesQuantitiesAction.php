@@ -5,7 +5,6 @@ namespace App\Actions\Data;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\StockProduct;
-use Illuminate\Support\Collection;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Lorisleiva\Actions\Concerns\AsJob;
 
@@ -15,7 +14,7 @@ class ElsieCodesQuantitiesAction
     use AsJob;
 
     //Using for an array of trash_codes
-    public function handle(array $codes): Collection
+    public function handle(array $codes)
     {
         ElsieTrashAction::run($codes, true);
         $trash = ElsieShowTrashAction::run($codes);
@@ -74,7 +73,7 @@ class ElsieCodesQuantitiesAction
         return $trashItem;
     }
 
-    protected function parseTrash(array $trash = null, array $codes = null): Collection
+    protected function parseTrash(array $trash = null, array $codes = null)
     {
         $trash = $trash ?? [];
         $codes = $codes ?? [];
@@ -97,7 +96,7 @@ class ElsieCodesQuantitiesAction
                         'stock_id' => $stock->id,
                         'product_id' => $product->id,
                     ])) {
-                        if (is_string($item['quantity'])) {
+                        if (!empty($item['quantity'])) {
                             $stockProduct->quantities()->create([
                                 'quantity' => $item['quantity'],
                             ]);

@@ -6,19 +6,21 @@ use App\Actions\CookieAction;
 use App\Models\ElsieCredentials;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use function optional;
+use Lorisleiva\Actions\Concerns\AsJob;
 
 class ElsieSearchAction extends CookieAction
 {
+    use AsJob;
+
     protected string $url = 'http://elsie.ua/rus/shop/searchitem';
 
-    public string $commandSignature = 'elsie:search {search}';
+    public string $commandSignature = 'elsie:search {code} {descr?}';
 
-    public function handle(string $search, int $credentials = null): ?array
+    public function handle(array $search): ?array
     {
-        if($credentials) {
-            $this->credentials = ElsieCredentials::find($credentials);
-        }
+//        if (auth()->id()) {
+            $this->credentials = ElsieCredentials::query()->find(1);
+//        }
 
         $response = Http::withBody($this->getBody($search), 'application/x-www-form-urlencoded')
             ->withHeaders([
@@ -39,27 +41,23 @@ class ElsieSearchAction extends CookieAction
             ->post($this->url);
 
         $this->getCookies($response);
-
         return $response->json();
     }
 
     public function asCommand(Command $command)
     {
-        optional($command->argument('search') ?? null, function (string $search) {
-            $this->handle($search);
-        });
+        $this->handle($command->arguments());
     }
 
-    protected function getBody(string $search): string
+    protected function getBody(array $search): string
     {
-        return implode('&', [
-            implode('=', [
-                'code',
-                $search,
-            ]),
-            implode('=', [
-                'descr', '',
-            ])
-        ]);
+        $body = [];
+        foreach ($search as $key => $value) {
+            $body[] = implode('=', [
+                $key,
+                urlencode($value),
+            ]);
+        }
+        return implode('&', $body);
     }
 }
