@@ -4,6 +4,9 @@ namespace App\Http\Livewire\StockProducts;
 
 use App\Models\StockProduct;
 use Asantibanez\LivewireCharts\Models\LineChartModel;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class LineChart extends Component
@@ -15,15 +18,15 @@ class LineChart extends Component
         '$refresh' => 'refresh',
     ];
 
-    public function render()
+    public function render(): Factory|View|Application
     {
-        $this->stockProduct->refresh();
+//        $this->stockProduct->refresh();
         return view('stock-products.line-chart')->with([
             'lineChartModel' => $this->getChartModel(),
         ]);
     }
 
-    public function getChartModel()
+    public function getChartModel(): LineChartModel
     {
         return new LineChartModel();
     }

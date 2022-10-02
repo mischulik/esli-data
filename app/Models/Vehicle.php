@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Actions\Data\ElsieSearchAction;
+use App\Actions\ElsieSaveFound;
 use App\Actions\ElsieSearchParse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -28,10 +30,22 @@ class Vehicle extends Model implements HasMedia
                 'R',
                 'L',
             ])->each(function (string $type) use ($vehicle) {
-                $data = ElsieSearchAction::make()->handle(implode('', [
+                $searchQuery = implode('', [
                     $vehicle->code,
                     $type,
-                ]), User::find(1)->elsie_credentials->id);
+                ]);
+
+//                $stockProducts = StockProduct::query()->whereHas('product', function (Builder $builder) use ($searchQuery) {
+//                    $builder->whereHas('prices')->where('elsie_code', 'like', $searchQuery);
+//                })->whereHas('quantities')->get();
+
+                $data = ElsieSearchAction::make()->handle([
+                    'code' => $searchQuery,
+                    'descr' => '',
+                ]);
+
+//                dd($data);
+
                 $data1 = $data[0] ?? null;
                 if (is_array($data1)) {
                     $data1 = $data1[0] ?? null;
@@ -41,7 +55,8 @@ class Vehicle extends Model implements HasMedia
                 }
                 collect($data)->each(function (array $searchResult) use ($vehicle) {
                     $searchResult['vehicle_id'] = $vehicle->id;
-                    ElsieSearchParse::run($searchResult);
+                    $searchResult = ElsieSearchParse::run($searchResult);
+                    ElsieSaveFound::run($searchResult);
                 });
             });
         });

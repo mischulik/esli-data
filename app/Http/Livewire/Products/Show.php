@@ -19,8 +19,8 @@ class Show extends Component
 
     public function route()
     {
-        return Route::get('/products/{product}', static::class)
-            ->name('products.show')
+        return Route::get('/products1/{product}', static::class)
+            ->name('products.show1')
             ->middleware(['auth', 'elsie_connection', 'elsie']);
     }
 

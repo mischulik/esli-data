@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class QuantitiesChart extends LineChart
 {
-    public function getChartModel()
+    public function getChartModel(): LineChartModel
     {
         return $this->query()
             ->get()->reduce(function (LineChartModel $lineChartModel, $stockProductQuantity) {

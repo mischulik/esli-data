@@ -22,4 +22,6 @@
             <livewire:products.manufacturer :manufacturer="$manufacturer" />
         @endif
     </div>
+
+
 </div>
