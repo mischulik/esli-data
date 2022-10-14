@@ -31,12 +31,12 @@ class ElsieCodesQuantitiesAction
     protected function parseTrashItem(array $item): array
     {
         $trashItem = [
-            'stock' => $item[7] ?? null,
+            'stock' => isset($item[7]) ? intval($item[7]) : null,
             'elsie_code' => $item[0] ?? null,
             'stock_code' => $item[1] ?? null,
         ];
 
-        $stock = optional($item[7] ?? null, function (string $stock) {
+        $stock = optional($trashItem['stock'] ?? null, function (string $stock) {
             return !empty(trim($stock)) ? trim($stock) : null;
         });
 
@@ -64,11 +64,10 @@ class ElsieCodesQuantitiesAction
         }
 
         $price = $item[3] ?? null;
-        $trashItem['price'] = !empty(trim($price)) ? trim($price) : null;
+        $trashItem['price'] = !empty(trim($price)) ? intval(trim($price)) : null;
 
-        $quantity = $item[5] ?? null;
-        $quantity = $quantity ?? ($item[6] ?? null);
-        $trashItem['quantity'] = !empty(trim($quantity)) ? trim($quantity) : null;
+        $quantity = isset($item[5]) ? intval(trim($item[5])) : null;
+        $trashItem['quantity'] = $quantity ?? (isset($item[6]) ? intval(trim($item[6])) : null);
 
         return $trashItem;
     }
@@ -85,9 +84,9 @@ class ElsieCodesQuantitiesAction
             });
 
             if ($product = Product::query()->whereElsieCode($item['elsie_code'])->first()) {
-                if(is_string($item['price'])) {
-                    $product->prices()->create([
-                        'price' => $item['price'],
+                if(isset($item['price'])) {
+                    $price = $product->prices()->create([
+                        'price' => intval($item['price']),
                     ]);
                 }
 
@@ -96,12 +95,15 @@ class ElsieCodesQuantitiesAction
                         'stock_id' => $stock->id,
                         'product_id' => $product->id,
                     ])) {
-                        if (!empty($item['quantity'])) {
-                            $stockProduct->quantities()->create([
+                        if (isset($item['quantity'])) {
+                            $quantity = $stockProduct->quantities()->create([
                                 'quantity' => $item['quantity'],
                             ]);
                         }
-                        return $stockProduct;
+                        return $stockProduct->load([
+                            'quantities',
+                            'actual_quantity',
+                        ]);
                     }
                 }
                 return null;

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 class StockProduct extends Model
@@ -20,9 +21,35 @@ class StockProduct extends Model
         'product_id',
     ];
 
-    protected $with = [
-        'actual_quantity',
+    protected $withCount = [
+        'quantities',
     ];
+
+    protected $with = [
+//        'actual_quantity',
+//        'quantities',
+    ];
+
+    public function newQuery()
+    {
+        return parent::newQuery()->addSelect([
+            'actual_quantity_quantity' => StockProductQuantity::query()
+                ->select('quantity')
+                ->whereColumn('stock_product_id', 'stock_products.id')
+                ->latest()
+                ->take(1),
+            'actual_quantity_units' => StockProductQuantity::query()
+                ->select('units')
+                ->whereColumn('stock_product_id', 'stock_products.id')
+                ->latest()
+                ->take(1),
+            'actual_quantity_date' => StockProductQuantity::query()
+                ->select('created_at')
+                ->whereColumn('stock_product_id', 'stock_products.id')
+                ->latest()
+                ->take(1),
+        ]);
+    }
 
     public function scopePresent(Builder $builder)
     {
@@ -90,7 +117,7 @@ class StockProduct extends Model
         return $this->hasMany(StockProductQuantity::class, 'stock_product_id', 'id');
     }
 
-    public function actual_quantity()
+    public function actual_quantity(): HasOne
     {
         return $this->hasOne(StockProductQuantity::class, 'stock_product_id', 'id')->latestOfMany()->withDefault([
             'quantity' => 0,

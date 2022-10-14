@@ -1,5 +1,5 @@
 <div class="list-group-item list-group-item-action">
-    <div class="d-inline-flex align-items-center justify-content-between w-100">
+    <div class="d-inline-flex align-content-center-center justify-content-between w-100">
         <div class="flex-grow-0 mb-2 mb-lg-0">
             <a href="{{ route('stock-products.show', ['stockProduct' => $stockProduct]) }}"
                class="text-decoration-none text-dark">

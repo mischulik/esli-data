@@ -6,9 +6,7 @@ use App\Actions\Data\ElsieSearchAction;
 use App\Actions\ElsieSaveFound;
 use App\Actions\ElsieSearchParse;
 use App\Models\Product;
-use App\Models\StockProduct;
 use Bastinald\Ui\Traits\WithModel;
-use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,7 +17,7 @@ class ElsieSearch extends Component
 
     public string $code = '';
     public string $descr = '';
-    public $searchResults;
+    public array $searchResults;
 
     public function updated()
     {

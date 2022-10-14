@@ -4,6 +4,9 @@ namespace App\Http\Livewire\StockProducts;
 
 use App\Actions\Data\StockProductInfoAction;
 use App\Models\StockProduct;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class Item extends Component
@@ -14,9 +17,12 @@ class Item extends Component
         '$getStockProductInfo' => 'getStockProductInfo',
     ];
 
-    public function render()
+    public function render(): Factory|View|Application
     {
-        $this->stockProduct->refresh();
+//        dd($this->stockProduct->product->actual_price()->toSql());
+
+
+//        $this->stockProduct->refresh();
         return view('stock-products.item')->with([
             'actual_price' => $this->stockProduct->product->actual_price,
             'actual_quantity' => $this->stockProduct->actual_quantity,

@@ -22,8 +22,8 @@ class Manufacturer extends Model implements HasMedia
     ];
 
     protected $withCount = [
-        'glasses',
-        'accessories',
+//        'glasses',
+//        'accessories',
     ];
 
     public function products(): HasMany

@@ -18,9 +18,11 @@ class ElsieSearchAction extends CookieAction
 
     public function handle(array $search): ?array
     {
-//        if (auth()->id()) {
-            $this->credentials = ElsieCredentials::query()->find(1);
-//        }
+        if (auth()->id()) {
+            $this->credentials = ElsieCredentials::query()->find(auth()->id());
+        } else {
+            $this->credentials = ElsieCredentials::find(1);
+        }
 
         $response = Http::withBody($this->getBody($search), 'application/x-www-form-urlencoded')
             ->withHeaders([

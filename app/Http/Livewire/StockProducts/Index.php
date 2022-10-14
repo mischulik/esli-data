@@ -3,6 +3,9 @@
 namespace App\Http\Livewire\StockProducts;
 
 use App\Models\Stock;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
@@ -61,14 +64,14 @@ class Index extends Component
             ->getQuery();
     }
 
-    public function route()
+    public function route(): \Illuminate\Routing\Route|array
     {
         return Route::get('/stock/{stock}/products', static::class)
             ->name('stock-products')
             ->middleware('auth');
     }
 
-    public function render()
+    public function render(): Factory|View|Application
     {
         return view('stock-products.index')->with([
             'stockProducts' => $this->query()->paginate(),

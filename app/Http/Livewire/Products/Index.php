@@ -6,7 +6,7 @@ use App\Http\Traits\WithCodeSearch;
 use App\Http\Traits\WithGlassAccessoryFilter;
 use App\Http\Traits\WithPlacement;
 use App\Models\Product;
-use App\Models\ProductPrice;
+use Bastinald\Ui\Traits\WithModel;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -21,10 +21,41 @@ class Index extends Component
     use WithPlacement;
     use WithCodeSearch;
     use WithGlassAccessoryFilter;
+    use WithModel;
 
-    public string $search = '';
+    protected $listeners = [
+        '$refresh',
+        '$search' => 'somethingGoesOn',
+    ];
 
-    protected $listeners = ['$refresh'];
+    public function query(): Builder
+    {
+        return $this->queryCodeSearch(
+            $this->queryGaFilter(
+                $this->queryPlacement(
+                    Product::with([
+                        'manufacturer',
+                        'vehicle',
+                        'stock_products',
+                        'stock_products.actual_quantity',
+                    ])
+//                        ->join('product_prices', 'product_prices.product_id', '=', 'products.id')->orderByDesc('product_prices.price')
+//                        ->orderByDesc(ProductPrice::query()->select('price')->whereColumn('product_prices.product_id', 'products.id')->latest()->take(1))
+                    ->orderByDesc('actual_price_date')
+                )
+            ));
+    }
+
+
+    public function somethingGoesOn(array $search)
+    {
+        foreach ($search as $key => $value)
+        {
+            $this->setModel($key, $value);
+        }
+
+        $this->emitSelf('$refresh');
+    }
 
     public function route(): \Illuminate\Routing\Route|array
     {
@@ -36,31 +67,8 @@ class Index extends Component
     public function render(): Factory|View|Application
     {
         return view('products.index', [
-            'products' =>
-                $this->query()->paginate(),
+            'products' => $this->query()->paginate(),
         ]);
-    }
-
-    public function query(): Builder
-    {
-        return $this->queryCodeSearch(
-            $this->queryGaFilter(
-                $this->queryPlacement(
-                    Product::query()
-//                        ->join('product_prices', 'product_prices.product_id', '=', 'products.id')->orderByDesc('product_prices.price')
-                    ->orderByDesc(ProductPrice::query()->select('price')->whereColumn('product_prices.product_id', 'products.id')->latest()->take(1))
-                )
-            ))
-//        )->orderByDesc(function ($builder) {
-//            return $builder->orderBy('actual_price');
-//        })
-;
-    }
-
-    public function updatedSearch()
-    {
-        $this->resetPage();
-        $this->emit('$refresh');
     }
 
     public function delete(Product $product)
