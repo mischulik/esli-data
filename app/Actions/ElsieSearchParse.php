@@ -12,6 +12,10 @@ class ElsieSearchParse
 
     public function handle(array $searchResult)
     {
+        if (!isset($searchResult[5])) {
+            return null;
+        }
+
         $parsed = collect(explode('-', collect(explode('.', $searchResult[0]))->first()))->last();
         $manufacturer = Product::suggestedManufacturer($parsed);
         $stock = Stock::query()->whereShopId($searchResult[5])->first();

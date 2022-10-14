@@ -25,8 +25,9 @@ trait WithGlassAccessoryFilter
             'selectedGaFilter' => Rule::in($this->gaFilterValues),
         ]);
 
-        $this->resetPage();
-        $this->emit('$refresh');
+        $this->emitUp('$search', [
+            'selectedGaFilter' => $this->selectedGaFilter,
+        ]);
     }
 
     public function queryGaFilter(Builder $builder)

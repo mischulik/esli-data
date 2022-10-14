@@ -16,7 +16,7 @@ trait WithPlacement
             'selectedPlacement' => Rule::in($this->placements),
         ]);
         $this->resetPage();
-        $this->emit('$refresh');
+        $this->emitUp('$search', $this->getModel());
     }
 
     public function queryPlacement(Builder $builder)

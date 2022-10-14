@@ -2,50 +2,52 @@
 
 namespace App\Http\Livewire;
 
+use App\Http\Traits\WithCodeSearch;
+use App\Http\Traits\WithGlassAccessoryFilter;
+use App\Http\Traits\WithPlacement;
+use App\Models\Product;
+use App\Models\ProductPrice;
 use Bastinald\Ui\Traits\WithModel;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class OffcanvasFilters extends Component
 {
     use WithModel;
-
-    public string $codeSearch = '';
-    public string $nameSearch = '';
-
-    public function mount(string $nameSearch = '', string $codeSearch = '')
-    {
-        $this->nameSearch = $nameSearch;
-        $this->codeSearch = $codeSearch;
-
-        $this->fill([
-            'nameSearch' => $this->nameSearch,
-            'codeSearch' => $this->codeSearch,
-        ]);
-    }
+    use WithGlassAccessoryFilter;
+    use WithCodeSearch;
+    use WithPlacement;
+    use WithPagination;
 
     public function render()
     {
         return view('offcanvas-filters')->with([
-            'nameSearch' => $this->nameSearch,
-            'codeSearch' => $this->codeSearch,
+
         ]);
     }
 
-    public function updatedModel()
-    {
-        $this->codeSearch = $this->getModel('codeSearch') ?? '';
-        $this->nameSearch = $this->getModel('nameSearch') ?? '';
-    }
+//    public function query(): Builder
+//    {
+//        return $this->queryCodeSearch(
+//            $this->queryGaFilter(
+//                $this->queryPlacement(
+//                    Product::with([
+//                        'manufacturer',
+//                        'vehicle',
+//                        'stock_products',
+//                        'stock_products.actual_quantity',
+//                        'actual_price'
+//                    ])
+////                        ->join('product_prices', 'product_prices.product_id', '=', 'products.id')->orderByDesc('product_prices.price')
+//                        ->orderByDesc(ProductPrice::query()->select('price')->whereColumn('product_prices.product_id', 'products.id')->latest()->take(1))
+//
+//                )
+//            ))
+////        )->orderByDesc(function ($builder) {
+////            return $builder->orderBy('actual_price');
+////        })
+//            ;
+//    }
 
-    public function accept()
-    {
-        $this->emit('$search', $this->validateModel([
-            'nameSearch' => [
-                'nullable', 'string'
-            ],
-            'codeSearch' => [
-                'nullable', 'string'
-            ],
-        ]));
-    }
 }

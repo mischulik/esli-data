@@ -26,10 +26,6 @@ class Show extends Component
 
     public function render()
     {
-        $this->product->fresh([
-            'actual_price',
-            'stock_products',
-        ])->refresh();
         return view('products.show');
     }
 }

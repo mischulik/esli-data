@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -32,10 +33,42 @@ class Product extends Model implements HasMedia
     ];
 
     protected $with = [
-        'actual_price',
+//        'actual_price',
+//        'prices',
     ];
 
-    public function scopeDefected(Builder $builder)
+    protected $withCount = [
+        'prices',
+    ];
+
+    public function newQuery()
+    {
+        return parent::newQuery()->with([
+            'actual_price',
+            'stock_products',
+        ])
+//            ->withSum('stock_products', 'actual_quantity_quantity')
+            ->select('*')
+            ->addSelect([
+                'actual_price_price' => ProductPrice::query()
+                    ->select('price')
+                    ->whereColumn('product_prices.product_id', 'products.id')
+                    ->latest()->take(1)
+            ])->addSelect([
+                'actual_price_currency' => ProductPrice::query()
+                    ->select('currency')
+                    ->whereColumn('product_prices.product_id', 'products.id')
+                    ->latest()->take(1)
+            ])->addSelect([
+                'actual_price_date' => ProductPrice::query()
+                    ->select('created_at')
+                    ->whereColumn('product_prices.product_id', 'products.id')
+                    ->latest()
+                    ->take(1)
+            ]);
+    }
+
+    public function scopeDefected(Builder $builder): Builder
     {
         return $builder->where('elsie_code', 'like', '%.%');
     }
@@ -97,12 +130,12 @@ class Product extends Model implements HasMedia
         return $this->hasMany(StockProduct::class, 'product_id', 'id');
     }
 
-    public function prices()
+    public function prices(): HasMany
     {
-        return $this->hasMany(ProductPrice::class, 'product_id', 'id')->orderBy('id');
+        return $this->hasMany(ProductPrice::class, 'product_id', 'id');
     }
 
-    public function actual_price()
+    public function actual_price(): HasOne
     {
         return $this->hasOne(ProductPrice::class, 'product_id', 'id')->latestOfMany()->withDefault([
             'price' => 0,
@@ -110,4 +143,18 @@ class Product extends Model implements HasMedia
             'created_at' => Carbon::minValue(),
         ]);
     }
+
+    public function getTotalQuantityAttribute()
+    {
+        return $this->stock_products()->with('actual_quantity')->get()->map(function (StockProduct $stockProduct) {
+            return $stockProduct->actual_quantity;
+        })->sum(function (StockProductQuantity  $stockProductQuantity) {
+            return $stockProductQuantity->quantity;
+        });
+    }
+
+//    public function newQuery()
+//    {
+//        return parent::query(), 'total_quantity')->getQuery();
+//    }
 }

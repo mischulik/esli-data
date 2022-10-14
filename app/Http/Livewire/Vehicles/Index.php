@@ -41,11 +41,14 @@ class Index extends Component
                     ->orWhere('code', 'like', $this->search . '%');
             });
         })
-            ->whereHas('products')
+            ->whereHas('products', function (Builder $builder) {
+                $builder->whereHas('actual_price');
+            })
             ->withCount('products')
 //            ->orderBy('name')
 //            ->orderBy('year_start')
-            ->orderByDesc('products_count');
+            ->orderByDesc('products_count')
+        ;
     }
 
     public function delete(Vehicle $vehicle)

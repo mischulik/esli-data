@@ -3,6 +3,9 @@
 namespace App\Http\Livewire\Stocks;
 
 use App\Models\Stock;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
@@ -20,7 +23,7 @@ class Index extends Component
             ->middleware('auth');
     }
 
-    public function render()
+    public function render(): Factory|View|Application
     {
         return view('stocks.index', [
             'stocks' => $this->query()->get(),
